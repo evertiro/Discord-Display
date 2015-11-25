@@ -1,0 +1,66 @@
+/* Gloabal styles
+-------------------------------------------------------------- */
+
+
+
+/* Default theme
+-------------------------------------------------------------- */
+.discord-display-theme-default .discord-channel {
+	font-weight: bold;
+	margin-top: 5px;
+}
+
+.discord-display-theme-default .discord-channel:first-child {
+	margin-top: 0;
+}
+
+.discord-display-theme-default .discord-member {
+	margin-left: 10px;
+}
+
+.discord-display-theme-default .discord-member-avatar {
+	display: inline-block;
+}
+
+.discord-display-theme-default .discord-member-avatar img {
+	height: 1em;
+	margin-right: 5px;
+	border-radius: 50%;
+}
+
+.discord-display-theme-default .discord-member-name {
+	display: inline-block;
+	height: 1em;
+	line-height: 1em;
+	vertical-align: middle;
+}
+
+.discord-display-theme-default .discord-member-status {
+	float: right;
+}
+
+.discord-display-theme-default .discord-member-status i {
+	margin-left: 3px;
+}
+
+.discord-display-theme-default .discord-footer {
+	margin-top: 5px;
+	padding-top: 5px;
+	border-top: 1px dotted;
+}
+
+.discord-display-theme-default .discord-online-users {
+	display: inline-block;
+}
+
+.discord-display-theme-default .discord-footer-connect-button {
+	text-align: center;
+}
+
+.discord-display-theme-default .discord-footer-connect-text .discord-connect-button {
+	float: right;
+}
+
+.discord-display-theme-default .discord-footer-connect-button .discord-connect-button {
+	margin-top: 5px;
+}
