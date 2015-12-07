@@ -78,10 +78,11 @@ class discord_display_widget extends WP_Widget {
 			$instance['title'] = str_replace( '%servername%', $json_data->name, $instance['title'] );
 		}
 
-		$title           = apply_filters( 'widget_title', $instance['title'], $instance, $args['id'] );
-		$display_avatars = isset( $instance['display_avatars'] ) && $instance['display_avatars'] == 'on' ? 1 : 0;
-		$display_status  = isset( $instance['display_status'] ) && $instance['display_status'] == 'on' ? 1 : 0;
-		$display_online  = isset( $instance['display_online'] ) && $instance['display_online'] == 'on' ? 1 : 0;
+		$title             = apply_filters( 'widget_title', $instance['title'], $instance, $args['id'] );
+		$display_avatars   = isset( $instance['display_avatars'] ) && $instance['display_avatars'] == 'on' ? 1 : 0;
+		$display_status    = isset( $instance['display_status'] ) && $instance['display_status'] == 'on' ? 1 : 0;
+		$display_channels  = isset( $instance['display_channels'] ) && $instance['display_channels'] == 'on' ? 1 : 0;
+		$display_online    = isset( $instance['display_online'] ) && $instance['display_online'] == 'on' ? 1 : 0;
 
 		$online_users    = array();
 
@@ -95,42 +96,50 @@ class discord_display_widget extends WP_Widget {
 
 		$widget  = '<div class="discord-display-widget discord-display-theme-' . $instance['theme'] . '">';
 
-		foreach( $json_data->channels as $channel ) {
-			$widget .= '<div class="discord-channel">' . $channel->name . '</div>';
+		if($display_channels) {
+			foreach( $json_data->channels as $channel ) {
+				$widget .= '<div class="discord-channel">' . $channel->name . '</div>';
 
-			foreach( $json_data->members as $member ) {
-				if( $display_online ) {
-					if( isset( $member->status ) && $member->status == 'online' && ! array_key_exists( $member->id, $online_users ) ){
-						$online_users[$member->id] = $member->username;
-					}
-				}
-
-				if( isset( $member->channel_id ) && $member->channel_id == $channel->id ) {
-					$widget .= '<div class="discord-member">';
-
-					if( $display_avatars ) {
-						$widget .= '<div class="discord-member-avatar"><img src="' . $member->avatar_url . '" /></div>';
+				foreach( $json_data->members as $member ) {
+					if( $display_online ) {
+						if( isset( $member->status ) && $member->status == 'online' && ! array_key_exists( $member->id, $online_users ) ){
+							$online_users[$member->id] = $member->username;
+						}
 					}
 
-					$widget .= '<div class="discord-member-name">';
-					$widget .= $member->username;
-					$widget .= '</div>';
+					if( isset( $member->channel_id ) && $member->channel_id == $channel->id ) {
+						$widget .= '<div class="discord-member">';
 
-					if( $display_status ) {
-						$widget .= '<div class="discord-member-status">';
-
-						if( ( isset( $member->deaf ) && $member->deaf ) || ( isset( $member->self_mute ) && $member->self_mute ) ) {
-							$widget .= '<i class="fa fa-volume-off"></i>';
+						if( $display_avatars ) {
+							$widget .= '<div class="discord-member-avatar"><img src="' . $member->avatar_url . '" /></div>';
 						}
 
-						if( ( isset( $member->mute ) && $member->mute ) || ( isset( $member->suppress ) && $member->suppress ) ) {
-							$widget .= '<i class="fa fa-microphone-slash"></i>';
+						$widget .= '<div class="discord-member-name">';
+						$widget .= $member->username;
+						$widget .= '</div>';
+
+						if( $display_status ) {
+							$widget .= '<div class="discord-member-status">';
+
+							if( ( isset( $member->deaf ) && $member->deaf ) || ( isset( $member->self_mute ) && $member->self_mute ) ) {
+								$widget .= '<i class="fa fa-volume-off"></i>';
+							}
+
+							if( ( isset( $member->mute ) && $member->mute ) || ( isset( $member->suppress ) && $member->suppress ) ) {
+								$widget .= '<i class="fa fa-microphone-slash"></i>';
+							}
+
+							$widget .= '</div>';
 						}
 
 						$widget .= '</div>';
 					}
-
-					$widget .= '</div>';
+				}
+			}
+		} else {
+			foreach ($json_data->members as $member) {
+				if (isset($member->status) && $member->status == 'online' && !array_key_exists($member->id, $online_users)) {
+					$online_users[$member->id] = $member->username;
 				}
 			}
 		}
@@ -181,14 +190,15 @@ class discord_display_widget extends WP_Widget {
 	public function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
 
-		$instance['title']           = strip_tags( $new_instance['title'] );
-		$instance['server_id']       = strip_tags( $new_instance['server_id'] );
-		$instance['theme']           = $new_instance['theme'];
-		$instance['display_avatars'] = isset( $new_instance['display_avatars'] ) ? $new_instance['display_avatars'] : '';
-		$instance['display_status']  = isset( $new_instance['display_status'] ) ? $new_instance['display_status'] : '';
-		$instance['display_online']  = isset( $new_instance['display_online'] ) ? $new_instance['display_online'] : '';
-		$instance['online_label']    = strip_tags( $new_instance['online_label'] );
-		$instance['connect_button']  = $new_instance['connect_button'];
+		$instance['title']             = strip_tags( $new_instance['title'] );
+		$instance['server_id']         = strip_tags( $new_instance['server_id'] );
+		$instance['theme']             = $new_instance['theme'];
+		$instance['display_avatars']   = isset( $new_instance['display_avatars'] ) ? $new_instance['display_avatars'] : '';
+		$instance['display_status']    = isset( $new_instance['display_status'] ) ? $new_instance['display_status'] : '';
+		$instance['display_online']    = isset( $new_instance['display_online'] ) ? $new_instance['display_online'] : '';
+		$instance['display_channels']  = isset( $new_instance['display_channels'] ) ? $new_instance['display_channels'] : '';
+		$instance['online_label']      = strip_tags( $new_instance['online_label'] );
+		$instance['connect_button']    = $new_instance['connect_button'];
 
 		return $instance;
 	}
@@ -204,14 +214,15 @@ class discord_display_widget extends WP_Widget {
 	 */
 	public function form( $instance ) {
 		$defaults = array(
-			'title'           => '',
-			'server_id'       => '',
-			'theme'           => 'default',
-			'display_avatars' => 'on',
-			'display_status'  => 'on',
-			'display_online'  => 'on',
-			'online_label'    => __( 'Users Online', 'discord-display' ),
-			'connect_button'  => 'text'
+			'title'             => '',
+			'server_id'         => '',
+			'theme'             => 'default',
+			'display_avatars'   => 'on',
+			'display_status'    => 'on',
+			'display_online'    => 'on',
+			'display_channels'  => 'on',
+			'online_label'      => __( 'Users Online', 'discord-display' ),
+			'connect_button'    => 'text'
 		);
 
 		$instance = wp_parse_args( (array) $instance, $defaults ); ?>
@@ -253,6 +264,11 @@ class discord_display_widget extends WP_Widget {
 		<p>
 			<input <?php checked( $instance['display_online'], 'on' ); ?> id="<?php echo esc_attr( $this->get_field_id( 'display_online' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'display_online' ) ); ?>" type="checkbox" />
 			<label for="<?php echo esc_attr( $this->get_field_id( 'display_online' ) ); ?>"><?php _e( 'Display User Count', 'discord-display' ); ?></label>
+		</p>
+
+		<p>
+			<input <?php checked( $instance['display_channels'], 'on' ); ?> id="<?php echo esc_attr( $this->get_field_id( 'display_channels' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'display_channels' ) ); ?>" type="checkbox" />
+			<label for="<?php echo esc_attr( $this->get_field_id( 'display_channels' ) ); ?>"><?php _e( 'Display Channel List', 'discord-display' ); ?></label>
 		</p>
 
 		<p>
